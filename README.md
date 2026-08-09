@@ -1,4 +1,4 @@
-# EDEN. // Sys_Garden v2.0
+# EDEN
 
 A digital garden built with [Astro](https://astro.build/). 
 
