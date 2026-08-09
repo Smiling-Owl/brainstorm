@@ -71,6 +71,43 @@ export async function GET() {
       }
     }
   }
+  // Implicitly connect notes of the same subject chronologically
+  const courseGroups = {};
+  for (const n of nodes) {
+    if (!courseGroups[n.group]) courseGroups[n.group] = [];
+    courseGroups[n.group].push(n.id);
+  }
+
+  for (const course in courseGroups) {
+    const courseIds = courseGroups[course];
+    
+    // Group by lesson base name
+    const lessons = {};
+    for (const id of courseIds) {
+      const base = id.replace(/_cornell_notes/i, '').replace(/_zettelkasten/i, '');
+      if (!lessons[base]) lessons[base] = [];
+      lessons[base].push(id);
+    }
+    
+    const sortedBases = Object.keys(lessons).sort();
+    
+    // Connect cornell to zettelkasten within the same lesson
+    for (const base of sortedBases) {
+       const ids = lessons[base];
+       if (ids.length > 1) {
+          for (let i = 1; i < ids.length; i++) {
+             links.push({ source: ids[0], target: ids[i] });
+          }
+       }
+    }
+    
+    // Connect lessons chronologically
+    for (let i = 0; i < sortedBases.length - 1; i++) {
+       const currentIds = lessons[sortedBases[i]];
+       const nextIds = lessons[sortedBases[i+1]];
+       links.push({ source: currentIds[0], target: nextIds[0] });
+    }
+  }
   
   return new Response(JSON.stringify({ nodes, links }), {
     headers: {

@@ -56,7 +56,7 @@ for (const note of allNotes) {
       <nav class="font-ui">
         {Object.entries(folderTree).map(([course, notes]) => (
           <div class="mb-6">
-            <div class="text-xs font-bold text-base mb-3 uppercase tracking-widest flex items-center bg-border p-1">
+            <div class="font-ui text-sm font-bold uppercase mb-2 bg-heading py-1 px-2 truncate" style="color: var(--color-base);" title={course}>
               <span class="mr-2">»</span> {course}
             </div>
             <ul class="pl-0 space-y-0">
