@@ -1,0 +1,66 @@
+---
+import { getCollection, render } from 'astro:content';
+import GardenLayout from '../layouts/GardenLayout.astro';
+
+export async function getStaticPaths() {
+  const gardenEntries = await getCollection('garden');
+  
+  return gardenEntries.map(entry => {
+    // entry.id format: "CourseName/synthesized_notes/zettelkasten/FileName.md"
+    const parts = entry.id.split('/');
+    const course = parts[0];
+    const filename = parts.pop()?.replace('.md', '');
+    const slug = `${course}/${filename}`;
+    
+    return {
+      params: { slug },
+      props: { entry },
+    };
+  });
+}
+
+const { entry } = Astro.props;
+const { Content, headings } = await render(entry);
+---
+
+<GardenLayout title={entry.data.title || entry.id.split('/').pop()?.replace('.md', '')} headings={headings}>
+  <article class="content-wrapper border-x-2 border-border px-8 py-10 bg-base min-h-full">
+    <header class="mb-12 border-b-4 border-heading pb-8">
+      
+      <div class="flex items-center gap-2 text-[10px] font-bold text-heading uppercase tracking-widest font-ui mb-6">
+        <span class="bg-heading text-base px-2 py-1">SYS.NODE</span>
+        <span class="border border-heading px-2 py-1">{entry.id.split('/')[0]}</span>
+      </div>
+
+      <h1 class="text-5xl md:text-6xl font-extrabold text-heading mb-6 tracking-tighter uppercase leading-none">
+        {entry.data.title || entry.id.split('/').pop()?.replace('.md', '').replace(/_/g, ' ')}
+      </h1>
+      
+      {entry.data.tags && entry.data.tags.length > 0 && (
+        <div class="flex flex-wrap gap-2 font-ui text-xs mt-4">
+          {entry.data.tags.map((tag: string) => (
+            <span class="border border-muted text-muted px-2 py-1 uppercase hover:bg-heading hover:text-base transition-none cursor-crosshair">
+              #{tag}
+            </span>
+          ))}
+        </div>
+      )}
+    </header>
+
+    <div class="prose-container relative">
+      <!-- Watermark/screentone effect behind text -->
+      <div class="absolute -top-10 -left-4 text-9xl font-extrabold text-panel opacity-50 select-none pointer-events-none -z-10">
+        {entry.id.split('/').pop()?.charAt(0).toUpperCase()}
+      </div>
+      
+      <Content />
+    </div>
+    
+    <footer class="mt-24 pt-8 border-t-2 border-dashed border-border flex justify-between items-center text-xs font-ui text-muted uppercase">
+      <p>EOF // {entry.id.split('/').pop()?.replace('.md', '')}</p>
+      <a href="/" class="hover:text-heading hover:bg-border px-2 py-1 transition-none">
+        [RETURN_HOME]
+      </a>
+    </footer>
+  </article>
+</GardenLayout>

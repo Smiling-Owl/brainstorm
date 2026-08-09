@@ -1,0 +1,36 @@
+---
+import GardenLayout from '../layouts/GardenLayout.astro';
+---
+
+<GardenLayout title="HOME">
+  <div class="content-wrapper flex flex-col items-center justify-center text-center mt-32 relative">
+    
+    <!-- Manga style brutalist welcome -->
+    <div class="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none -z-10 select-none">
+      <span class="text-[20rem] font-extrabold leading-none tracking-tighter">孤</span>
+    </div>
+
+    <div class="bg-base border-4 border-heading p-10 max-w-2xl relative" style="box-shadow: 16px 16px 0px var(--color-heading);">
+      <div class="bg-heading text-base font-ui text-sm uppercase p-2 absolute -top-8 -left-1 font-bold">
+        x
+      </div>
+      
+      <h1 class="text-5xl font-extrabold text-heading mb-6 tracking-tighter uppercase mt-4">EDEN</h1>
+      
+      <p class="text-text mb-10 text-lg font-ui leading-relaxed text-left border-l-4 border-primary pl-4">
+        too ez<br/>
+      </p>
+      
+      <div class="grid grid-cols-2 gap-0 border-2 border-border font-ui text-left text-xs uppercase">
+        <div class="p-4 border-r border-border hover:bg-heading hover:text-base transition-none group cursor-crosshair">
+          <span class="block text-primary font-bold mb-2 group-hover:text-base">01 // NAVIGATE</span>
+          <span class="text-muted group-hover:text-base">Browse courses via the left sidebar database.</span>
+        </div>
+        <div class="p-4 hover:bg-heading hover:text-base transition-none group cursor-crosshair">
+          <span class="block text-primary font-bold mb-2 group-hover:text-base">02 // SEARCH</span>
+          <span class="text-muted group-hover:text-base">Press [CTRL + K] to query the global index.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</GardenLayout>

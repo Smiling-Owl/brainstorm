@@ -1,0 +1,406 @@
+---
+import '../styles/global.css';
+import { getCollection } from 'astro:content';
+
+const { title, headings } = Astro.props;
+
+// Fetch all notes to build the left sidebar accordion tree
+const allNotes = await getCollection('garden');
+const currentPath = Astro.url.pathname;
+
+// Build the tree: { "CourseName": [ { title, slug } ] }
+const folderTree: Record<string, any[]> = {};
+for (const note of allNotes) {
+  const parts = note.id.split('/');
+  const course = parts[0];
+  const filename = parts.pop()?.replace('.md', '');
+  const slug = `${course}/${filename}`;
+  
+  if (!folderTree[course]) folderTree[course] = [];
+  folderTree[course].push({ title: note.data.title || filename, slug });
+}
+---
+
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title} | EDEN</title>
+    
+    <!-- Pagefind CSS -->
+    <link href="/pagefind/pagefind-ui.css" rel="stylesheet">
+  </head>
+  <body class="flex flex-col md:flex-row min-h-screen">
+    
+    <!-- Left Sidebar: Folder Tree -->
+    <aside class="w-full md:w-72 border-b md:border-b-0 md:border-r-2 border-border bg-base p-6 flex-shrink-0 h-auto md:h-screen md:sticky top-0 overflow-y-auto">
+      <div class="mb-10 border-b-2 border-heading pb-4">
+        <a href="/" class="text-4xl font-extrabold tracking-tighter text-heading hover:text-primary transition-none flex items-center gap-3">
+          <div class="w-10 h-10 flex items-center justify-center -rotate-90 overflow-visible">
+            <img src="/logo.svg" class="max-w-full max-h-full object-contain mix-blend-multiply" alt="Eden Logo" />
+          </div>
+          EDEN
+        </a>
+      </div>
+      
+      <!-- Search Trigger -->
+      <div class="mb-8">
+        <button id="search-btn" class="w-full font-ui bg-panel border-2 border-border px-3 py-3 text-sm text-heading text-left flex items-center justify-between hover:bg-heading hover:text-base transition-none group cursor-pointer">
+          <span class="uppercase tracking-wider">[SEARCH_DATA]</span>
+          <kbd class="hidden md:inline-block border border-current px-1 text-[10px] group-hover:border-base group-hover:text-base">CTRL+K</kbd>
+        </button>
+      </div>
+
+      <nav class="font-ui">
+        {Object.entries(folderTree).map(([course, notes]) => (
+          <div class="mb-6">
+            <div class="text-xs font-bold text-base mb-3 uppercase tracking-widest flex items-center bg-border p-1">
+              <span class="mr-2">»</span> {course}
+            </div>
+            <ul class="pl-0 space-y-0">
+              {notes.map(note => {
+                const noteUrl = `/${note.slug}`;
+                const isActive = currentPath === noteUrl || currentPath === `${noteUrl}/`;
+                return (
+                <li class="border-b border-border border-dashed">
+                  <a href={noteUrl} class={`transition-none text-xs block py-2 px-2 uppercase truncate ${isActive ? 'text-primary font-bold' : 'text-muted hover:bg-heading hover:text-base'}`}>
+                    {isActive ? `> ${note.title.replace(/_/g, ' ')}` : note.title.replace(/_/g, ' ')}
+                  </a>
+                </li>
+                );
+              })}
+            </ul>
+          </div>
+        ))}
+      </nav>
+    </aside>
+
+    <!-- Center: Main Content (Reading View) -->
+    <main class="flex-1 p-6 md:p-12 lg:p-16 w-full h-auto md:h-screen overflow-y-auto bg-base" data-pagefind-body>
+      <div class="max-w-3xl mx-auto">
+        <slot />
+      </div>
+    </main>
+
+    <!-- Right Sidebar: Graph & TOC -->
+    <aside class="w-full md:w-80 border-t md:border-t-0 md:border-l-2 border-border bg-base p-6 flex-shrink-0 h-auto md:h-screen md:sticky top-0 overflow-y-auto">
+      
+      <!-- Graph Area -->
+      <div class="mb-10 w-full overflow-hidden">
+        <h3 class="font-ui text-xs font-bold mb-2 uppercase tracking-widest bg-heading inline-block px-2 py-1 truncate max-w-full" style="color: var(--color-base);">
+          {title || '[NEURAL_MAP]'}
+        </h3>
+        <div id="graph-container" class="aspect-square bg-panel border-2 border-border flex flex-col items-center justify-center text-muted text-xs cursor-crosshair">
+          <span class="font-ui uppercase blinking-cursor">INITIALIZING...</span>
+        </div>
+      </div>
+
+      <!-- TOC Area -->
+      {headings && headings.length > 0 && (
+        <div class="font-ui">
+          <h3 class="text-xs font-bold text-heading mb-4 uppercase tracking-widest border-b border-heading pb-2">
+            INDEX
+          </h3>
+          <ul class="space-y-0 text-xs">
+            {headings.map((heading: any) => (
+              <li class="border-b border-border border-dotted">
+                <a 
+                  href={`#${heading.slug}`} 
+                  class="text-muted hover:text-heading hover:bg-border transition-none block py-2 uppercase"
+                  style={`padding-left: ${(heading.depth - 1) * 1}rem;`}
+                >
+                  {heading.text}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </aside>
+
+    <!-- Search Modal -->
+    <div id="search-modal" class="hidden fixed inset-0 bg-base/90 z-50 flex items-start justify-center pt-20 px-4">
+      <div class="bg-panel border-2 border-heading p-0 w-full max-w-2xl relative flex flex-col max-h-[80vh]" style="box-shadow: 8px 8px 0px var(--color-heading);">
+         <div class="bg-heading text-base font-ui text-xs uppercase p-2 flex justify-between items-center shrink-0">
+           <span>SYSTEM.SEARCH</span>
+           <button id="close-search" class="hover:text-primary font-bold">ESC [X]</button>
+         </div>
+         <div class="p-6 overflow-y-auto flex-1 custom-scrollbar">
+           <div id="search"></div>
+         </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/pagefind/pagefind-ui.js" is:inline></script>
+    <script is:inline>
+      document.addEventListener('DOMContentLoaded', () => {
+        // Init Search
+        if (typeof PagefindUI !== 'undefined') {
+          new PagefindUI({ element: "#search", showSubResults: true });
+        }
+
+        const modal = document.getElementById('search-modal');
+        const searchBtn = document.getElementById('search-btn');
+        const closeBtn = document.getElementById('close-search');
+
+        searchBtn?.addEventListener('click', () => {
+          modal.classList.remove('hidden');
+          document.body.classList.add('overflow-hidden');
+        });
+        closeBtn?.addEventListener('click', () => {
+          modal.classList.add('hidden');
+          document.body.classList.remove('overflow-hidden');
+        });
+
+        document.addEventListener('keydown', (e) => {
+          if (e.ctrlKey && e.key === 'k') {
+            e.preventDefault();
+            modal.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+            document.querySelector('.pagefind-ui__search-input')?.focus();
+          }
+          if (e.key === 'Escape') {
+            modal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+          }
+        });
+      });
+    </script>
+    
+    <script>
+      // @ts-nocheck
+      import * as d3 from 'd3';
+
+      document.addEventListener('DOMContentLoaded', () => {
+        // Init Graph
+        fetch('/graph.json')
+          .then(res => res.json())
+          .then(data => {
+            const elem = document.getElementById('graph-container');
+            if (!elem) return;
+            
+            elem.innerHTML = ''; // Clear placeholder
+            
+            // Get current CSS variables for colors
+            const getVar = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim() || (window.matchMedia('(prefers-color-scheme: dark)').matches ? '#ffffff' : '#000000');
+            const nodeColor = getVar('--color-heading') || '#000000';
+            const linkColor = getVar('--color-border') || '#111111';
+            const primaryColor = getVar('--color-primary') || '#d90000';
+            const bgColor = getVar('--color-base') || '#ffffff';
+
+            // Filter for Local Graph
+            let currentPath = window.location.pathname;
+            if (currentPath.endsWith('/') && currentPath.length > 1) {
+              currentPath = currentPath.slice(0, -1);
+            }
+            
+            let graphData = data;
+            let currentNode = null;
+            
+            if (currentPath !== '/' && currentPath !== '') {
+               currentNode = data.nodes.find(n => n.url === currentPath || n.url === currentPath + '/');
+               
+               if (currentNode) {
+                 const connectedLinks = data.links.filter(l => l.source === currentNode.id || l.target === currentNode.id);
+                 const connectedNodeIds = new Set();
+                 connectedNodeIds.add(currentNode.id);
+                 connectedLinks.forEach(l => {
+                   connectedNodeIds.add(l.source);
+                   connectedNodeIds.add(l.target);
+                 });
+                 
+                 const connectedNodes = data.nodes.filter(n => connectedNodeIds.has(n.id));
+                 
+                 graphData = {
+                   nodes: connectedNodes,
+                   links: connectedLinks
+                 };
+               }
+            }
+
+            const width = elem.clientWidth || 300;
+            const height = elem.clientHeight || width;
+
+            const svg = d3.select(elem)
+              .append('svg')
+              .attr('width', width)
+              .attr('height', height)
+              .attr('viewBox', [-width / 2, -height / 2, width, height])
+              .style('max-width', '100%')
+              .style('height', 'auto')
+              .style('display', 'block')
+              .style('cursor', 'crosshair');
+
+            // Copy graphData because d3.forceSimulation mutates it
+            const nodes = graphData.nodes.map(d => ({ ...d }));
+            const links = graphData.links.map(d => ({ ...d }));
+
+            // Calculate node degrees
+            const nodeDegree = {};
+            links.forEach(l => {
+              nodeDegree[l.source] = (nodeDegree[l.source] || 0) + 1;
+              nodeDegree[l.target] = (nodeDegree[l.target] || 0) + 1;
+            });
+
+            const simulation = d3.forceSimulation(nodes)
+              .force('link', d3.forceLink(links).id(d => d.id).distance(100))
+              .force('charge', d3.forceManyBody().strength(-400))
+              .force('center', d3.forceCenter(0, 0))
+              .force('x', d3.forceX().strength(0.05))
+              .force('y', d3.forceY().strength(0.05));
+
+            // Add zoom wrapper
+            const g = svg.append('g');
+
+            const zoom = d3.zoom()
+              .scaleExtent([0.25, 4])
+              .on('zoom', (event) => {
+                g.attr('transform', event.transform);
+              });
+            svg.call(zoom);
+
+            // Glow filter definition
+            const defs = svg.append("defs");
+            const filter = defs.append("filter")
+              .attr("id", "glow")
+              .attr("x", "-50%")
+              .attr("y", "-50%")
+              .attr("width", "200%")
+              .attr("height", "200%");
+            filter.append("feGaussianBlur")
+              .attr("stdDeviation", "3")
+              .attr("result", "coloredBlur");
+            const feMerge = filter.append("feMerge");
+            feMerge.append("feMergeNode").attr("in", "coloredBlur");
+            feMerge.append("feMergeNode").attr("in", "SourceGraphic");
+
+            // Draw explicit SVG links
+            const link = g.append('g')
+              .attr('stroke', linkColor)
+              .attr('stroke-opacity', 0.4)
+              .attr('stroke-width', 1.5)
+              .selectAll('line')
+              .data(links)
+              .join('line')
+              .attr('class', 'transition-all duration-300');
+
+            // Draw nodes group
+            const nodeGroup = g.append('g')
+              .selectAll('g')
+              .data(nodes)
+              .join('g')
+              .style('cursor', 'pointer')
+              .call(d3.drag()
+                .on('start', dragstarted)
+                .on('drag', dragged)
+                .on('end', dragended));
+
+            // Node halos (glow)
+            nodeGroup.append('circle')
+              .attr('r', d => ((currentNode && d.id === currentNode.id) ? 10 : 4) + (nodeDegree[d.id] || 0) * 1.2 + 4)
+              .attr('fill', d => (currentNode && d.id === currentNode.id) ? primaryColor : nodeColor)
+              .attr('opacity', 0.2)
+              .attr('filter', 'url(#glow)')
+              .attr('class', 'node-halo transition-all duration-300');
+
+            // Node core
+            const node = nodeGroup.append('circle')
+              .attr('r', d => ((currentNode && d.id === currentNode.id) ? 10 : 4) + (nodeDegree[d.id] || 0) * 1.2)
+              .attr('fill', d => (currentNode && d.id === currentNode.id) ? primaryColor : bgColor)
+              .attr('stroke', d => (currentNode && d.id === currentNode.id) ? primaryColor : nodeColor)
+              .attr('stroke-width', 2)
+              .attr('class', 'node-core transition-all duration-300');
+
+            // Label for hovered node
+            const labels = nodeGroup.append('text')
+              .text(d => d.name)
+              .attr('x', 12)
+              .attr('y', 4)
+              .attr('font-size', '10px')
+              .attr('font-family', 'inherit')
+              .attr('fill', nodeColor)
+              .attr('opacity', 0)
+              .attr('class', 'node-label font-ui uppercase transition-all duration-300 pointer-events-none');
+
+            // Interactivity
+            nodeGroup.on('mouseover', (event, d) => {
+              // Dim others
+              link.attr('stroke-opacity', l => (l.source.id === d.id || l.target.id === d.id) ? 1 : 0.05)
+                  .attr('stroke', l => (l.source.id === d.id || l.target.id === d.id) ? primaryColor : linkColor);
+              
+              nodeGroup.selectAll('.node-core')
+                  .attr('opacity', n => (n.id === d.id || isConnected(d, n)) ? 1 : 0.2)
+                  .attr('fill', n => (n.id === d.id || isConnected(d, n)) ? primaryColor : bgColor)
+                  .attr('stroke', n => (n.id === d.id || isConnected(d, n)) ? primaryColor : nodeColor);
+                  
+              nodeGroup.selectAll('.node-halo')
+                  .attr('opacity', n => (n.id === d.id || isConnected(d, n)) ? 0.4 : 0);
+
+              nodeGroup.selectAll('.node-label')
+                  .attr('opacity', n => (n.id === d.id) ? 1 : 0);
+            });
+
+            nodeGroup.on('mouseout', () => {
+              // Restore
+              link.attr('stroke-opacity', 0.4).attr('stroke', linkColor);
+              nodeGroup.selectAll('.node-core')
+                  .attr('opacity', 1)
+                  .attr('fill', n => (currentNode && n.id === currentNode.id) ? primaryColor : bgColor)
+                  .attr('stroke', n => (currentNode && n.id === currentNode.id) ? primaryColor : nodeColor);
+              nodeGroup.selectAll('.node-halo')
+                  .attr('opacity', 0.2);
+              nodeGroup.selectAll('.node-label').attr('opacity', 0);
+            });
+
+            nodeGroup.on('click', (event, d) => {
+              window.location.href = d.url;
+            });
+
+            function isConnected(a, b) {
+              return links.some(l => (l.source.id === a.id && l.target.id === b.id) || (l.source.id === b.id && l.target.id === a.id));
+            }
+
+            simulation.on('tick', () => {
+              link
+                .attr('x1', d => d.source.x)
+                .attr('y1', d => d.source.y)
+                .attr('x2', d => d.target.x)
+                .attr('y2', d => d.target.y);
+
+              nodeGroup.attr('transform', d => `translate(${d.x},${d.y})`);
+            });
+
+            function dragstarted(event) {
+              if (!event.active) simulation.alphaTarget(0.3).restart();
+              event.subject.fx = event.subject.x;
+              event.subject.fy = event.subject.y;
+            }
+            function dragged(event) {
+              event.subject.fx = event.x;
+              event.subject.fy = event.y;
+            }
+            function dragended(event) {
+              if (!event.active) simulation.alphaTarget(0);
+              event.subject.fx = null;
+              event.subject.fy = null;
+            }
+              
+          })
+          .catch(err => {
+            const elem = document.getElementById('graph-container');
+            if (elem) elem.innerHTML = '<span class="font-ui text-xs text-primary uppercase">MAP CORRUPTED</span>';
+          });
+      });
+    </script>
+    <style>
+      .blinking-cursor::after {
+        content: '_';
+        animation: blink 1s step-end infinite;
+      }
+      @keyframes blink { 50% { opacity: 0; } }
+    </style>
+  </body>
+</html>
