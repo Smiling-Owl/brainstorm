@@ -145,8 +145,8 @@ for (const note of allNotes) {
               <li class="border-b border-border border-dotted">
                 <a 
                   href={`#${heading.slug}`} 
-                  class="text-muted hover:text-heading hover:bg-border transition-none block py-2 uppercase"
-                  style={`padding-left: ${(heading.depth - 1) * 1}rem;`}
+                  class="text-muted hover:text-base hover:bg-heading transition-none block py-2 uppercase"
+                  style={`padding-left: ${(heading.depth - 1) * 1 + 0.5}rem; padding-right: 0.5rem;`}
                 >
                   {heading.text}
                 </a>
