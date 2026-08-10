@@ -3,7 +3,7 @@ import { glob } from 'astro/loaders';
 
 const garden = defineCollection({
   loader: glob({
-    pattern: '**/{synthesized_notes/zettelkasten,synthesized_notes/cornell}/*.md',
+    pattern: '**/synthesized_notes/cornell/*.md',
     base: './4-2026-2027-1'
   }),
   schema: z.object({

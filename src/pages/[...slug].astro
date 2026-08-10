@@ -21,6 +21,9 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const { Content, headings } = await render(entry);
+
+const allGardenEntries = await getCollection('garden');
+const validSlugs = allGardenEntries.map(e => e.id.split('/').pop()?.replace('.md', ''));
 ---
 
 <GardenLayout title={entry.data.title || entry.id.split('/').pop()?.replace('.md', '')} headings={headings}>
@@ -64,3 +67,25 @@ const { Content, headings } = await render(entry);
     </footer>
   </article>
 </GardenLayout>
+
+<script define:vars={{ validSlugs }}>
+  document.addEventListener('DOMContentLoaded', () => {
+    const links = document.querySelectorAll('.content-wrapper a');
+    links.forEach(link => {
+      const href = link.getAttribute('href');
+      // Process internal links (starts with / but not //)
+      if (href && href.startsWith('/') && !href.startsWith('//')) {
+        const targetFilename = href.split('/').pop();
+        // Decode URI component in case of spaces/special chars in URL
+        const decodedTarget = decodeURIComponent(targetFilename);
+        if (!validSlugs.includes(decodedTarget) && !validSlugs.includes(targetFilename)) {
+          // Dead link detected
+          link.classList.add('line-through', 'text-muted', 'cursor-not-allowed', 'opacity-50');
+          link.classList.remove('hover:text-primary', 'hover:border-primary', 'text-heading');
+          link.addEventListener('click', e => e.preventDefault());
+          link.title = "This note has been archived or removed";
+        }
+      }
+    });
+  });
+</script>
