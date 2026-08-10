@@ -49,6 +49,11 @@ for (const note of allNotes) {
       <span class="font-ui text-xs font-bold leading-none tracking-widest mt-1">MENU</span>
     </button>
 
+    <!-- Zen Mode FAB (Web only) -->
+    <button id="zen-mode-btn" class="hidden md:flex fixed bottom-6 right-6 z-50 w-14 h-14 bg-base text-heading border-2 border-heading flex-col items-center justify-center shadow-[4px_4px_0_var(--color-heading)] hover:bg-heading hover:text-base active:shadow-[0_0_0_var(--color-heading)] active:translate-x-1 active:translate-y-1 transition-all cursor-crosshair">
+      <span class="font-ui font-extrabold text-xl leading-none">[ Z ]</span>
+    </button>
+
     <!-- Mobile Backdrop -->
     <div id="mobile-backdrop" class="fixed inset-0 bg-heading/80 z-30 hidden md:hidden transition-opacity"></div>
 
@@ -117,7 +122,7 @@ for (const note of allNotes) {
     </main>
 
     <!-- Right Sidebar: Graph & TOC -->
-    <aside class="hidden md:block w-80 border-l-2 border-border bg-base p-6 flex-shrink-0 h-screen sticky top-0 overflow-y-auto">
+    <aside id="right-sidebar" class="hidden md:block w-80 border-l-2 border-border bg-base p-6 flex-shrink-0 h-screen sticky top-0 overflow-y-auto">
       
       <!-- Graph Area -->
       <div class="mb-10 w-full overflow-hidden">
@@ -464,6 +469,31 @@ for (const note of allNotes) {
         if (mobileBtn) mobileBtn.addEventListener("click", toggleMenu);
         if (mobileCloseBtn) mobileCloseBtn.addEventListener("click", toggleMenu);
         if (mobileBackdrop) mobileBackdrop.addEventListener("click", toggleMenu);
+
+        // Zen Mode Toggle
+        const zenBtn = document.getElementById("zen-mode-btn");
+        const toggleZenMode = (enable) => {
+          if (enable) {
+            document.body.classList.add("zen-mode");
+            localStorage.setItem("eden-zen-mode", "true");
+            if (zenBtn) zenBtn.classList.add("bg-heading", "text-base");
+          } else {
+            document.body.classList.remove("zen-mode");
+            localStorage.setItem("eden-zen-mode", "false");
+            if (zenBtn) zenBtn.classList.remove("bg-heading", "text-base");
+          }
+        };
+
+        if (localStorage.getItem("eden-zen-mode") === "true") {
+          toggleZenMode(true);
+        }
+
+        if (zenBtn) {
+          zenBtn.addEventListener("click", () => {
+            const isZen = document.body.classList.contains("zen-mode");
+            toggleZenMode(!isZen);
+          });
+        }
       });
     </script>
     <style>

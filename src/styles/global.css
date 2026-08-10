@@ -135,3 +135,11 @@ html {
   scrollbar-width: thin;
   scrollbar-color: var(--color-heading) var(--color-panel);
 }
+
+/* -------------------------------------
+   ZEN / FOCUS MODE
+------------------------------------- */
+body.zen-mode #left-sidebar,
+body.zen-mode #right-sidebar {
+  display: none !important;
+}
