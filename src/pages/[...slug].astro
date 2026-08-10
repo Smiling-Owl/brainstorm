@@ -70,7 +70,7 @@ const validSlugs = allGardenEntries.map(e => e.id.split('/').pop()?.replace('.md
 
 <script define:vars={{ validSlugs }}>
   document.addEventListener('DOMContentLoaded', () => {
-    const links = document.querySelectorAll('.content-wrapper a');
+    const links = document.querySelectorAll('.content-wrapper a.internal');
     links.forEach(link => {
       const href = link.getAttribute('href');
       // Process internal links (starts with / but not //)
