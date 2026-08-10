@@ -78,10 +78,16 @@ for (const note of allNotes) {
     </aside>
 
     <!-- Center: Main Content (Reading View) -->
-    <main class="flex-1 p-6 md:p-12 lg:p-16 w-full h-auto md:h-screen overflow-y-auto bg-base" data-pagefind-body>
-      <div class="max-w-3xl mx-auto">
+    <main class="flex-1 p-6 md:p-12 lg:p-16 w-full h-auto md:h-screen overflow-y-auto bg-base relative" data-pagefind-body>
+      <div class="max-w-3xl mx-auto h-full relative z-10">
         <slot />
       </div>
+
+      {title === 'HOME' && (
+        <div class="absolute bottom-0 left-0 w-full h-[35vh] opacity-60 grayscale mix-blend-multiply pointer-events-none z-0" style="mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%); -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%);">
+          <img src="/image.png" class="w-full h-full object-cover object-bottom" alt="Flower Field" />
+        </div>
+      )}
     </main>
 
     <!-- Right Sidebar: Graph & TOC -->
