@@ -50,8 +50,8 @@ for (const note of allNotes) {
     </button>
 
     <!-- Zen Mode FAB (Web only) -->
-    <button id="zen-mode-btn" class="hidden md:flex fixed bottom-6 right-6 z-50 w-14 h-14 bg-base text-heading border-2 border-heading flex-col items-center justify-center shadow-[4px_4px_0_var(--color-heading)] hover:bg-heading hover:text-base active:shadow-[0_0_0_var(--color-heading)] active:translate-x-1 active:translate-y-1 transition-all cursor-crosshair">
-      <span class="font-ui font-extrabold text-xl leading-none">[ Z ]</span>
+    <button id="zen-mode-btn" class="hidden md:flex fixed bottom-6 right-6 z-50 w-auto px-4 h-12 bg-heading text-base border-2 border-heading flex-row items-center justify-center shadow-[4px_4px_0_var(--color-heading)] active:shadow-[0_0_0_var(--color-heading)] active:translate-x-1 active:translate-y-1 transition-none cursor-crosshair">
+      <span class="font-ui font-extrabold text-sm tracking-widest uppercase leading-none">[ ZEN ]</span>
     </button>
 
     <!-- Mobile Backdrop -->
@@ -476,11 +476,19 @@ for (const note of allNotes) {
           if (enable) {
             document.body.classList.add("zen-mode");
             localStorage.setItem("eden-zen-mode", "true");
-            if (zenBtn) zenBtn.classList.add("bg-heading", "text-base");
+            if (zenBtn) {
+              zenBtn.classList.add("bg-primary", "border-primary");
+              zenBtn.classList.remove("bg-heading", "border-heading");
+              zenBtn.innerHTML = '<span class="font-ui font-extrabold text-sm tracking-widest uppercase leading-none">[ EXIT ]</span>';
+            }
           } else {
             document.body.classList.remove("zen-mode");
             localStorage.setItem("eden-zen-mode", "false");
-            if (zenBtn) zenBtn.classList.remove("bg-heading", "text-base");
+            if (zenBtn) {
+              zenBtn.classList.remove("bg-primary", "border-primary");
+              zenBtn.classList.add("bg-heading", "border-heading");
+              zenBtn.innerHTML = '<span class="font-ui font-extrabold text-sm tracking-widest uppercase leading-none">[ ZEN ]</span>';
+            }
           }
         };
 
