@@ -34,15 +34,36 @@ for (const note of allNotes) {
   </head>
   <body class="flex flex-col md:flex-row min-h-screen">
     
+    <!-- Mobile Top Bar -->
+    <div class="md:hidden p-4 border-b-2 border-border bg-base z-30 sticky top-0 flex justify-center">
+      <a href="/" class="text-2xl font-extrabold tracking-tighter text-heading flex items-center gap-2">
+        <div class="w-8 h-8 flex items-center justify-center -rotate-90">
+          <img src="/logo.svg" class="max-w-full max-h-full object-contain" alt="Eden Logo" />
+        </div>
+        EDEN
+      </a>
+    </div>
+
+    <!-- Mobile FAB (Hanko Stamp) -->
+    <button id="mobile-fab-btn" class="md:hidden fixed bottom-6 right-6 z-50 w-14 h-14 bg-primary text-base border-2 border-heading flex flex-col items-center justify-center shadow-[4px_4px_0_var(--color-heading)] active:shadow-[0_0_0_var(--color-heading)] active:translate-x-1 active:translate-y-1 transition-all cursor-pointer">
+      <span class="font-ui text-xs font-bold leading-none tracking-widest mt-1">MENU</span>
+    </button>
+
+    <!-- Mobile Backdrop -->
+    <div id="mobile-backdrop" class="fixed inset-0 bg-heading/80 z-30 hidden md:hidden transition-opacity"></div>
+
     <!-- Left Sidebar: Folder Tree -->
-    <aside id="left-sidebar" class="w-full md:w-72 border-b md:border-b-0 md:border-r-2 border-border bg-base p-6 flex-shrink-0 h-auto md:h-screen md:sticky top-0 overflow-y-auto">
-      <div class="mb-10 border-b-2 border-heading pb-4">
+    <aside id="left-sidebar" class="fixed inset-y-0 left-0 z-40 w-4/5 sm:w-72 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 border-r-2 border-border bg-base p-6 flex-shrink-0 h-screen md:sticky top-0 overflow-y-auto shadow-[8px_0_0_var(--color-heading)] md:shadow-none">
+      <div class="mb-10 border-b-2 border-heading pb-4 flex justify-between items-center">
         <a href="/" class="text-4xl font-extrabold tracking-tighter text-heading hover:text-primary transition-none flex items-center gap-3">
           <div class="w-10 h-10 flex items-center justify-center -rotate-90 overflow-visible">
             <img src="/logo.svg" class="max-w-full max-h-full object-contain" alt="Eden Logo" />
           </div>
           EDEN
         </a>
+        <button id="mobile-close-btn" class="md:hidden font-ui text-xl font-bold hover:text-primary transition-none cursor-pointer">
+          [X]
+        </button>
       </div>
       
       <!-- Search Trigger -->
@@ -96,7 +117,7 @@ for (const note of allNotes) {
     </main>
 
     <!-- Right Sidebar: Graph & TOC -->
-    <aside class="w-full md:w-80 border-t md:border-t-0 md:border-l-2 border-border bg-base p-6 flex-shrink-0 h-auto md:h-screen md:sticky top-0 overflow-y-auto">
+    <aside class="hidden md:block w-80 border-l-2 border-border bg-base p-6 flex-shrink-0 h-screen sticky top-0 overflow-y-auto">
       
       <!-- Graph Area -->
       <div class="mb-10 w-full overflow-hidden">
@@ -421,6 +442,28 @@ for (const note of allNotes) {
             sessionStorage.setItem("sidebar-scroll", sidebar.scrollTop.toString());
           });
         }
+
+        // Mobile Menu Toggle
+        const mobileBtn = document.getElementById("mobile-fab-btn");
+        const mobileCloseBtn = document.getElementById("mobile-close-btn");
+        const mobileBackdrop = document.getElementById("mobile-backdrop");
+        
+        const toggleMenu = () => {
+          const isClosed = sidebar.classList.contains("-translate-x-full");
+          if (isClosed) {
+            sidebar.classList.remove("-translate-x-full");
+            mobileBackdrop.classList.remove("hidden");
+            document.body.classList.add("overflow-hidden");
+          } else {
+            sidebar.classList.add("-translate-x-full");
+            mobileBackdrop.classList.add("hidden");
+            document.body.classList.remove("overflow-hidden");
+          }
+        };
+
+        if (mobileBtn) mobileBtn.addEventListener("click", toggleMenu);
+        if (mobileCloseBtn) mobileCloseBtn.addEventListener("click", toggleMenu);
+        if (mobileBackdrop) mobileBackdrop.addEventListener("click", toggleMenu);
       });
     </script>
     <style>
