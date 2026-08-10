@@ -84,9 +84,14 @@ for (const note of allNotes) {
       </div>
 
       {title === 'HOME' && (
-        <div class="absolute bottom-0 left-0 w-full h-[35vh] opacity-60 grayscale mix-blend-multiply pointer-events-none z-0" style="mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%); -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%);">
-          <img src="/image.png" class="w-full h-full object-cover object-bottom" alt="Flower Field" />
-        </div>
+        <>
+          <div class="absolute top-0 left-0 w-full h-[35vh] opacity-60 grayscale mix-blend-multiply pointer-events-none z-0" style="mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%); -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%);">
+            <img src="/top.png" class="w-full h-full object-cover object-top" alt="Top Banner" />
+          </div>
+          <div class="absolute bottom-0 left-0 w-full h-[35vh] opacity-60 grayscale mix-blend-multiply pointer-events-none z-0" style="mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%); -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%);">
+            <img src="/image.png" class="w-full h-full object-cover object-bottom" alt="Flower Field" />
+          </div>
+        </>
       )}
     </main>
 
