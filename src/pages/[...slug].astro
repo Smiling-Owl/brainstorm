@@ -71,6 +71,8 @@ const validSlugs = allGardenEntries.map(e => e.id.split('/').pop()?.replace('.md
 <script define:vars={{ validSlugs }}>
   document.addEventListener('DOMContentLoaded', () => {
     const links = document.querySelectorAll('.content-wrapper a.internal');
+    const tooltipCache = {};
+
     links.forEach(link => {
       const href = link.getAttribute('href');
       // Process internal links (starts with / but not //)
@@ -84,6 +86,48 @@ const validSlugs = allGardenEntries.map(e => e.id.split('/').pop()?.replace('.md
           link.classList.remove('hover:text-primary', 'hover:border-primary', 'text-heading');
           link.addEventListener('click', e => e.preventDefault());
           link.title = "This note has been archived or removed";
+        } else {
+          // Valid link - Attach Brutalist Tooltip
+          if (typeof tippy !== 'undefined') {
+            tippy(link, {
+              theme: 'brutalist',
+              content: '<div class="font-ui text-primary animate-pulse">[FETCHING_DATA...]</div>',
+              allowHTML: true,
+              animation: false,
+              duration: 0,
+              delay: [0, 0],
+              placement: 'top',
+              maxWidth: 300,
+              onShow(instance) {
+                if (tooltipCache[href]) {
+                  instance.setContent(tooltipCache[href]);
+                  return;
+                }
+                fetch(href)
+                  .then(response => response.text())
+                  .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    // Find the first paragraph in the prose container
+                    const firstPara = doc.querySelector('.prose-container p');
+                    if (firstPara) {
+                      let text = firstPara.innerText.trim();
+                      if (text.length > 150) text = text.substring(0, 147) + '...';
+                      const content = `<div class="font-ui tracking-widest leading-relaxed p-2">${text}</div>`;
+                      tooltipCache[href] = content;
+                      instance.setContent(content);
+                    } else {
+                      const content = '<div class="font-ui text-primary p-2">[NO PREVIEW DATA]</div>';
+                      tooltipCache[href] = content;
+                      instance.setContent(content);
+                    }
+                  })
+                  .catch(() => {
+                    instance.setContent('<div class="font-ui text-primary p-2">[DATA CORRUPTED]</div>');
+                  });
+              }
+            });
+          }
         }
       }
     });
