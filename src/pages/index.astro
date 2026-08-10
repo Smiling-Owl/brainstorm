@@ -3,9 +3,14 @@ import GardenLayout from '../layouts/GardenLayout.astro';
 ---
 
 <GardenLayout title="HOME">
-  <div class="flex flex-col min-h-[calc(100vh-6rem)] md:min-h-[calc(100vh-8rem)]">
+  <div class="flex flex-col min-h-[calc(100vh-6rem)] md:min-h-[calc(100vh-8rem)] relative overflow-hidden">
     
-    <div class="content-wrapper flex flex-col items-center justify-center text-center mt-auto mb-auto relative pt-10">
+    <!-- Manga Filtered Image Background -->
+    <div class="absolute inset-0 w-full h-full opacity-60 grayscale mix-blend-multiply pointer-events-none z-0">
+      <img src="/image.png" class="w-full h-full object-cover object-center" alt="Flower Field" />
+    </div>
+
+    <div class="content-wrapper flex flex-col items-center justify-center text-center mt-auto mb-auto relative pt-10 z-10">
       
       <!-- Manga style brutalist welcome -->
       <div class="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none -z-10 select-none">
@@ -34,11 +39,6 @@ import GardenLayout from '../layouts/GardenLayout.astro';
           </div>
         </div>
       </div>
-    </div>
-
-    <!-- Manga Filtered Image at absolute bottom of column -->
-    <div class="mt-auto w-full flex justify-center opacity-60 grayscale mix-blend-multiply pointer-events-none -mb-6 md:-mb-16 z-0" style="mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 80%); -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 80%);">
-      <img src="/image.png" class="max-w-full h-auto max-h-[40vh] object-cover object-bottom" alt="Flower Field" />
     </div>
 
   </div>
