@@ -135,3 +135,66 @@ html {
   scrollbar-width: thin;
   scrollbar-color: var(--color-heading) var(--color-panel);
 }
+
+/* -------------------------------------
+   NOTEBOOK THEME OVERRIDES 
+------------------------------------- */
+html[data-theme="notebook"] {
+  /* Soft, clean colors */
+  --color-base: #f8fafc;
+  --color-surface: #ffffff;
+  --color-panel: #ffffff;
+  --color-border: #cbd5e1;
+  --color-border-hover: #94a3b8;
+  --color-text: #334155;
+  --color-heading: #0f172a;
+  --color-primary: #2563eb; /* Calm blue */
+  --color-muted: #64748b;
+  
+  --font-ui: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  
+  /* Pagefind Overrides */
+  --pagefind-ui-primary: #2563eb;
+  --pagefind-ui-text: #334155;
+  --pagefind-ui-background: #ffffff;
+  --pagefind-ui-border: #cbd5e1;
+  --pagefind-ui-tag: #f1f5f9;
+  --pagefind-ui-border-width: 1px;
+  --pagefind-ui-border-radius: 8px;
+  --pagefind-ui-font: ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Remove Manga Textures and update fonts */
+html[data-theme="notebook"] body {
+  background-image: none !important;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+}
+
+/* Add rounded corners to everything instead of 0px */
+html[data-theme="notebook"] * {
+  border-radius: 6px !important;
+}
+
+/* Soften all border thicknesses */
+html[data-theme="notebook"] [class*="border-2"],
+html[data-theme="notebook"] [class*="border-b-2"],
+html[data-theme="notebook"] [class*="border-r-2"],
+html[data-theme="notebook"] [class*="border-l-2"],
+html[data-theme="notebook"] [class*="border-t-2"],
+html[data-theme="notebook"] [class*="border-4"] {
+  border-width: 1px !important;
+}
+
+/* Convert harsh solid shadows into soft blurs */
+html[data-theme="notebook"] [class*="shadow-"] {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Clean up specific inputs and scrollbars */
+html[data-theme="notebook"] input[type="radio"] {
+  border-radius: 50% !important;
+}
+
+html[data-theme="notebook"] ::-webkit-scrollbar-thumb {
+  border-radius: 6px !important;
+}

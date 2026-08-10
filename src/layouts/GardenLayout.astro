@@ -31,6 +31,10 @@ for (const note of allNotes) {
     
     <!-- Pagefind CSS -->
     <link href="/pagefind/pagefind-ui.css" rel="stylesheet">
+    <script is:inline>
+      const theme = localStorage.getItem('eden-theme') || 'manga';
+      document.documentElement.setAttribute('data-theme', theme);
+    </script>
   </head>
   <body class="flex flex-col md:flex-row min-h-screen">
     
@@ -67,10 +71,17 @@ for (const note of allNotes) {
       </div>
       
       <!-- Search Trigger -->
-      <div class="mb-8">
+      <div class="mb-2">
         <button id="search-btn" class="w-full font-ui bg-panel border-2 border-border px-3 py-3 text-sm text-heading text-left flex items-center justify-between hover:bg-heading hover:text-base transition-none group cursor-pointer">
           <span class="uppercase tracking-wider">[SEARCH_DATA]</span>
           <kbd class="hidden md:inline-block border border-current px-1 text-[10px] group-hover:border-base group-hover:text-base">CTRL+K</kbd>
+        </button>
+      </div>
+
+      <!-- Settings Trigger -->
+      <div class="mb-8">
+        <button id="settings-btn" class="w-full font-ui bg-base border-2 border-border px-3 py-2 text-xs text-heading text-left flex items-center justify-between hover:bg-heading hover:text-base transition-none group cursor-pointer">
+          <span class="uppercase tracking-wider">[SETTINGS]</span>
         </button>
       </div>
 
@@ -154,13 +165,36 @@ for (const note of allNotes) {
 
     <!-- Search Modal -->
     <div id="search-modal" class="hidden fixed inset-0 bg-base/90 z-50 flex items-start justify-center pt-20 px-4">
-      <div class="bg-panel border-2 border-heading p-0 w-full max-w-2xl relative flex flex-col max-h-[80vh]" style="box-shadow: 8px 8px 0px var(--color-heading);">
+      <div class="bg-panel border-2 border-heading p-0 w-full max-w-2xl relative flex flex-col max-h-[80vh] shadow-[8px_8px_0_var(--color-heading)]">
          <div class="bg-heading text-base font-ui text-xs uppercase p-2 flex justify-between items-center shrink-0">
            <span>SYSTEM.SEARCH</span>
            <button id="close-search" class="hover:text-primary font-bold">ESC [X]</button>
          </div>
          <div class="p-6 overflow-y-auto flex-1 custom-scrollbar">
            <div id="search"></div>
+         </div>
+      </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="hidden fixed inset-0 bg-base/90 z-50 flex items-start justify-center pt-20 px-4">
+      <div class="bg-panel border-2 border-heading p-0 w-full max-w-lg relative flex flex-col shadow-[8px_8px_0_var(--color-heading)]">
+         <div class="bg-heading text-base font-ui text-xs uppercase p-2 flex justify-between items-center shrink-0">
+           <span>SYSTEM.SETTINGS</span>
+           <button id="close-settings" class="hover:text-primary font-bold">[X]</button>
+         </div>
+         <div class="p-6 overflow-y-auto flex-1 font-ui text-sm">
+           <h3 class="font-bold text-heading mb-4 border-b-2 border-border pb-2">THEME SELECTION</h3>
+           <div class="space-y-4">
+             <label class="flex items-center space-x-3 cursor-pointer group">
+               <input type="radio" name="theme-select" value="manga" class="appearance-none w-4 h-4 border-2 border-border checked:bg-primary rounded-none outline-none cursor-pointer" />
+               <span class="group-hover:text-primary">Manga / Brutalist (Default)</span>
+             </label>
+             <label class="flex items-center space-x-3 cursor-pointer group">
+               <input type="radio" name="theme-select" value="notebook" class="appearance-none w-4 h-4 border-2 border-border checked:bg-primary rounded-none outline-none cursor-pointer" />
+               <span class="group-hover:text-primary">Notebook / Clean</span>
+             </label>
+           </div>
          </div>
       </div>
     </div>
@@ -177,7 +211,12 @@ for (const note of allNotes) {
         const modal = document.getElementById('search-modal');
         const searchBtn = document.getElementById('search-btn');
         const closeBtn = document.getElementById('close-search');
+        
+        const settingsModal = document.getElementById('settings-modal');
+        const settingsBtn = document.getElementById('settings-btn');
+        const closeSettingsBtn = document.getElementById('close-settings');
 
+        // Search logic
         searchBtn?.addEventListener('click', () => {
           modal.classList.remove('hidden');
           document.body.classList.add('overflow-hidden');
@@ -185,6 +224,34 @@ for (const note of allNotes) {
         closeBtn?.addEventListener('click', () => {
           modal.classList.add('hidden');
           document.body.classList.remove('overflow-hidden');
+        });
+
+        // Settings logic
+        settingsBtn?.addEventListener('click', () => {
+          settingsModal.classList.remove('hidden');
+          document.body.classList.add('overflow-hidden');
+        });
+        closeSettingsBtn?.addEventListener('click', () => {
+          settingsModal.classList.add('hidden');
+          document.body.classList.remove('overflow-hidden');
+        });
+        
+        // Theme selection logic
+        const themeRadios = document.querySelectorAll('input[name="theme-select"]');
+        
+        const applyTheme = (theme) => {
+          document.documentElement.setAttribute('data-theme', theme);
+          localStorage.setItem('eden-theme', theme);
+          themeRadios.forEach(r => r.checked = (r.value === theme));
+        };
+        
+        const savedTheme = localStorage.getItem('eden-theme') || 'manga';
+        applyTheme(savedTheme);
+        
+        themeRadios.forEach(radio => {
+          radio.addEventListener('change', (e) => {
+            applyTheme(e.target.value);
+          });
         });
 
         document.addEventListener('keydown', (e) => {
