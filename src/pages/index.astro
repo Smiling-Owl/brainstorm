@@ -5,9 +5,9 @@ import GardenLayout from '../layouts/GardenLayout.astro';
 <GardenLayout title="HOME">
   <div class="flex flex-col min-h-[calc(100vh-6rem)] md:min-h-[calc(100vh-8rem)] relative overflow-hidden">
     
-    <!-- Manga Filtered Image Background -->
-    <div class="absolute inset-0 w-full h-full opacity-60 grayscale mix-blend-multiply pointer-events-none z-0">
-      <img src="/image.png" class="w-full h-full object-cover object-center" alt="Flower Field" />
+    <!-- Manga Filtered Image Background (Footer Banner) -->
+    <div class="absolute bottom-0 left-0 w-full h-[35vh] opacity-60 grayscale mix-blend-multiply pointer-events-none z-0" style="mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%); -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%);">
+      <img src="/image.png" class="w-full h-full object-cover object-bottom" alt="Flower Field" />
     </div>
 
     <div class="content-wrapper flex flex-col items-center justify-center text-center mt-auto mb-auto relative pt-10 z-10">
